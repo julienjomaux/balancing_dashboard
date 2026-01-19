@@ -8,8 +8,11 @@ from datetime import date
 # --- Streamlit UI ---
 st.title("Elia Balancing and Imbalance Data (Opendata)")
 
+# Set the default date to 15 January 2026
+default_date = date(2026, 1, 15)
+
 # Calendar for date input
-selected_date = st.date_input("Select a date", value=date.today())
+selected_date = st.date_input("Select a date", value=default_date)
 date_str = selected_date.strftime("%Y-%m-%d")
 
 @st.cache_data(show_spinner=False)
@@ -133,3 +136,4 @@ ax6.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 plt.xticks(rotation=45)
 st.subheader("Cap and Floor Price (ods166)")
 st.pyplot(fig6)
+
