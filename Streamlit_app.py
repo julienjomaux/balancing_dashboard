@@ -29,9 +29,12 @@ except Exception as e:
     st.stop()
 
 req134 = ['datetime', 'imbalanceprice', 'systemimbalance', 'alpha']
-req127 = ['datetime', 'igccvolumeup', 'igccvolumedown', 'afrrvolumeup', 'afrrvolumedown',
-          'mfrrsaup', 'mfrrsadown', 'mfrrdaup', 'mfrrdadown', 'reserve_sharing_import', 'reserve_sharing_export']
+req127 = [
+    'datetime', 'igccvolumeup', 'igccvolumedown', 'afrrvolumeup', 'afrrvolumedown',
+    'mfrrsaup', 'mfrrsadown', 'mfrrdaup', 'mfrrdadown', 'reserve_sharing_import', 'reserve_sharing_export'
+]
 req152 = ['datetime', 'downwardavailableafrrvol', 'upwardavailableafrrvol']
+
 if not all(c in df134.columns for c in req134) or \
    not all(c in df127.columns for c in req127) or \
    not all(c in df152.columns for c in req152):
@@ -112,3 +115,26 @@ ax5.set_xlabel('Hour of Day')
 plt.xticks(rotation=45)
 st.subheader("Available aFRR")
 st.pyplot(fig5)
+
+# --- PLOT 6: Cap and Floor Price from ods152 (new graph) ---
+# Try to fetch these extra columns, if available.
+extra_cols = ['cap', 'floorprice']
+for col in extra_cols:
+    if col not in df152.columns:
+        df152[col] = None  # or use numpy.nan if you want
+
+if 'cap' in df152.columns and 'floorprice' in df152.columns:
+    fig6, ax6 = plt.subplots(figsize=(12, 4))
+    ax6.step(df152['datetime'], df152['cap'], where='post', label='Cap', lw=2, color='tab:blue')
+    ax6.step(df152['datetime'], df152['floorprice'], where='post', label='Floor Price', lw=2, color='tab:red')
+    ax6.set_ylabel('Cap / Floor Price (€/MWh)')
+    ax6.set_xlabel('Hour of Day')
+    ax6.legend(loc='upper left')
+    ax6.grid(True, axis='y', linestyle=':', alpha=0.7)
+    ax6.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0,24,2)))
+    ax6.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    plt.xticks(rotation=45)
+    st.subheader("Cap and Floor Price (ods152)")
+    st.pyplot(fig6)
+else:
+    st.info("Cap and/or Floor Price data ('cap', 'floorprice') not available for this date in ods152.")
