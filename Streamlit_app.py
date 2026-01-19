@@ -55,9 +55,6 @@ df152['datetime'] = pd.to_datetime(df152['datetime']); df152.sort_values('dateti
 df166['datetime'] = pd.to_datetime(df166['datetime']); df166.sort_values('datetime', inplace=True)
 
 # --- PLOT 1: Imbalance price + alpha ---
-st.caption(
-    'This graph shows the imbalance price and teh alpha component.'
-)
 fig1, ax1 = plt.subplots(figsize=(12, 4))
 ax1.step(df134['datetime'], df134['imbalanceprice'], where='post', c='tab:blue', label='Imbalance Price', lw=2)
 ax1.step(df134['datetime'], df134['alpha'], where='post', c='tab:gray', label='Alpha', lw=2, linestyle='--')
@@ -123,7 +120,6 @@ ax5.legend(loc='upper left')
 ax5.grid(True, axis='y', linestyle=':', alpha=0.7)
 ax5.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0,24,2)))
 ax5.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-ax5.set_xlabel('Hour of Day')
 plt.xticks(rotation=45)
 st.subheader("Available aFRR")
 st.pyplot(fig5)
@@ -133,13 +129,13 @@ fig6, ax6 = plt.subplots(figsize=(12, 4))
 ax6.step(df166['datetime'], df166['cap'], where='post', label='Cap', lw=2, color='tab:blue')
 ax6.step(df166['datetime'], df166['floorprice'], where='post', label='Floor Price', lw=2, color='tab:red')
 ax6.set_ylabel('Cap / Floor Price (€/MWh)')
-ax6.set_xlabel('Hour of Day')
 ax6.legend(loc='upper left')
 ax6.grid(True, axis='y', linestyle=':', alpha=0.7)
 ax6.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0,24,2)))
 ax6.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 plt.xticks(rotation=45)
-st.subheader("Cap and Floor Price (ods166)")
+st.subheader("Cap and Floor Price")
 st.pyplot(fig6)
+
 
 
