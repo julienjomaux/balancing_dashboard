@@ -24,6 +24,7 @@ try:
     df134 = fetch("ods134", date_str)
     df127 = fetch("ods127", date_str)
     df152 = fetch("ods152", date_str)
+    df166 = fetch("ods166", date_str)
 except Exception as e:
     st.error(f"Error fetching data: {e}")
     st.stop()
@@ -34,16 +35,19 @@ req127 = [
     'mfrrsaup', 'mfrrsadown', 'mfrrdaup', 'mfrrdadown', 'reserve_sharing_import', 'reserve_sharing_export'
 ]
 req152 = ['datetime', 'downwardavailableafrrvol', 'upwardavailableafrrvol']
+req166 = ['datetime', 'cap', 'floorprice']
 
 if not all(c in df134.columns for c in req134) or \
    not all(c in df127.columns for c in req127) or \
-   not all(c in df152.columns for c in req152):
-    st.warning("Data columns missing for this date.")
+   not all(c in df152.columns for c in req152) or \
+   not all(c in df166.columns for c in req166):
+    st.warning("Some required data columns are missing for the selected date.")
     st.stop()
 
 df134['datetime'] = pd.to_datetime(df134['datetime']); df134.sort_values('datetime', inplace=True)
 df127['datetime'] = pd.to_datetime(df127['datetime']); df127.sort_values('datetime', inplace=True)
 df152['datetime'] = pd.to_datetime(df152['datetime']); df152.sort_values('datetime', inplace=True)
+df166['datetime'] = pd.to_datetime(df166['datetime']); df166.sort_values('datetime', inplace=True)
 
 # --- PLOT 1: Imbalance price + alpha ---
 fig1, ax1 = plt.subplots(figsize=(12, 4))
@@ -116,25 +120,16 @@ plt.xticks(rotation=45)
 st.subheader("Available aFRR")
 st.pyplot(fig5)
 
-# --- PLOT 6: Cap and Floor Price from ods152 (new graph) ---
-# Try to fetch these extra columns, if available.
-extra_cols = ['cap', 'floorprice']
-for col in extra_cols:
-    if col not in df152.columns:
-        df152[col] = None  # or use numpy.nan if you want
-
-if 'cap' in df152.columns and 'floorprice' in df152.columns:
-    fig6, ax6 = plt.subplots(figsize=(12, 4))
-    ax6.step(df152['datetime'], df152['cap'], where='post', label='Cap', lw=2, color='tab:blue')
-    ax6.step(df152['datetime'], df152['floorprice'], where='post', label='Floor Price', lw=2, color='tab:red')
-    ax6.set_ylabel('Cap / Floor Price (€/MWh)')
-    ax6.set_xlabel('Hour of Day')
-    ax6.legend(loc='upper left')
-    ax6.grid(True, axis='y', linestyle=':', alpha=0.7)
-    ax6.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0,24,2)))
-    ax6.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-    plt.xticks(rotation=45)
-    st.subheader("Cap and Floor Price (ods152)")
-    st.pyplot(fig6)
-else:
-    st.info("Cap and/or Floor Price data ('cap', 'floorprice') not available for this date in ods152.")
+# --- PLOT 6: Cap and Floor Price from ods166 ---
+fig6, ax6 = plt.subplots(figsize=(12, 4))
+ax6.step(df166['datetime'], df166['cap'], where='post', label='Cap', lw=2, color='tab:blue')
+ax6.step(df166['datetime'], df166['floorprice'], where='post', label='Floor Price', lw=2, color='tab:red')
+ax6.set_ylabel('Cap / Floor Price (€/MWh)')
+ax6.set_xlabel('Hour of Day')
+ax6.legend(loc='upper left')
+ax6.grid(True, axis='y', linestyle=':', alpha=0.7)
+ax6.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0,24,2)))
+ax6.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+plt.xticks(rotation=45)
+st.subheader("Cap and Floor Price (ods166)")
+st.pyplot(fig6)
