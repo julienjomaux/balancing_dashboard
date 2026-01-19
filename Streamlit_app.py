@@ -30,6 +30,7 @@ try:
     df127 = fetch("ods127", date_str)
     df152 = fetch("ods152", date_str)
     df166 = fetch("ods166", date_str)
+    df013 = fetch("ods013", date_str)  # <--- Fetch ods013
 except Exception as e:
     st.error(f"Error fetching data: {e}")
     st.stop()
@@ -137,5 +138,40 @@ plt.xticks(rotation=45)
 st.subheader("Cap and Floor Price")
 st.pyplot(fig6)
 
+# --- NEW PLOTS: Available Transfer Capacity (ATC) for Import/Export ---
 
+countries_to_plot = ["Germany", "France", "Netherlands"]
+ods013_colnames = ['country', 'availabletransfercapacityatlastclosedgate', 'direction', 'datetime', 'resolutioncode']
+
+if all(c in df013.columns for c in ods013_colnames):
+    df013['datetime'] = pd.to_datetime(df013['datetime'])
+    df013.sort_values('datetime', inplace=True)
+
+    def plot_atc(direction, st_title):
+        df_sel = df013[
+            (df013['direction'].str.lower() == direction.lower()) & 
+            (df013['country'].isin(countries_to_plot))
+        ]
+        fig, ax = plt.subplots(figsize=(12, 4))
+        for country in countries_to_plot:
+            df_c = df_sel[df_sel['country'] == country]
+            ax.step(df_c['datetime'], df_c['availabletransfercapacityatlastclosedgate'], where='post', label=country)
+        ax.set_ylabel('ATC (MW)')
+        ax.set_title(f"ATC ({direction}) for {', '.join(countries_to_plot)}")
+        ax.legend(loc='upper left')
+        ax.grid(True, axis='y', linestyle=':', alpha=0.7)
+        ax.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0,24,2)))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        plt.xticks(rotation=45)
+        st.subheader(st_title)
+        st.pyplot(fig)
+
+    # --- ATC Import
+    plot_atc("Import", "Available Transfer Capacity (Import) — DE, FR, NL")
+
+    # --- ATC Export
+    plot_atc("Export", "Available Transfer Capacity (Export) — DE, FR, NL")
+
+else:
+    st.warning("Some required data columns from ods013 are missing for the selected date, ATC plots not generated.")
 
