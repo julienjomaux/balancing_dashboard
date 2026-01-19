@@ -7,7 +7,9 @@ from datetime import date
 
 # --- Streamlit UI ---
 st.title("Elia Balancing and Imbalance Data (Opendata)")
-
+st.caption(
+    'This app downloads data from [Elia Open Data](https://opendata.elia.be/). It works for dates from 22 May 2024 onwards.'
+)
 # Set the default date to 15 January 2026
 default_date = date(2026, 1, 15)
 
@@ -53,6 +55,9 @@ df152['datetime'] = pd.to_datetime(df152['datetime']); df152.sort_values('dateti
 df166['datetime'] = pd.to_datetime(df166['datetime']); df166.sort_values('datetime', inplace=True)
 
 # --- PLOT 1: Imbalance price + alpha ---
+st.caption(
+    'This graph shows the imbalance price and teh alpha component.'
+)
 fig1, ax1 = plt.subplots(figsize=(12, 4))
 ax1.step(df134['datetime'], df134['imbalanceprice'], where='post', c='tab:blue', label='Imbalance Price', lw=2)
 ax1.step(df134['datetime'], df134['alpha'], where='post', c='tab:gray', label='Alpha', lw=2, linestyle='--')
@@ -136,4 +141,5 @@ ax6.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 plt.xticks(rotation=45)
 st.subheader("Cap and Floor Price (ods166)")
 st.pyplot(fig6)
+
 
