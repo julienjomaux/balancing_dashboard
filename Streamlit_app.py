@@ -6,7 +6,7 @@ import matplotlib.dates as mdates
 from datetime import date
 
 # --- Streamlit UI ---
-st.title("Elia Balancing and Imbalance Data (Opendata)")
+st.set_page_config(page_title="Elia Balancing and Imbalance Data (Opendata)", page_icon="GEM.webp")
 st.caption(
     'This app downloads data from [Elia Open Data](https://opendata.elia.be/). It works for dates from 22 May 2024 onwards.'
 )
@@ -174,4 +174,5 @@ if all(c in df013.columns for c in ods013_colnames):
 
 else:
     st.warning("Some required data columns from ods013 are missing for the selected date, ATC plots not generated.")
+
 
