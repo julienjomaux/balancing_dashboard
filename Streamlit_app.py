@@ -1,21 +1,25 @@
 import streamlit as st
 import requests
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-from datetime import date
-
-# --- Streamlit UI ---
+from datetime import datetime, date, time, timedelta
+from zoneinfo import ZoneInfo  # Python 3.9+
+ 
 st.set_page_config(page_title="Elia Balancing and Imbalance Data (Opendata)", page_icon="GEM.webp")
 st.caption(
     'This app downloads data from [Elia Open Data](https://opendata.elia.be/). It works for dates from 22 May 2024 onwards.'
 )
-# Set the default date to 15 January 2026
 default_date = date(2026, 1, 15)
-
-# Calendar for date input
 selected_date = st.date_input("Select a date", value=default_date)
-date_str = selected_date.strftime("%Y-%m-%d")
+
+# ---- Timezone conversion: Belgium local to UTC ----
+def get_utc_date(local_date):
+    # Belgium time zone = Europe/Brussels
+    local_dt = datetime.combine(local_date, time(0, 0), tzinfo=ZoneInfo("Europe/Brussels"))
+    # Convert to UTC
+    utc_dt = local_dt.astimezone(ZoneInfo("UTC"))
+    return utc_dt.strftime("%Y-%m-%d")
+
+date_str = get_utc_date(selected_date)
 
 @st.cache_data(show_spinner=False)
 def fetch(dataset, d):
@@ -30,7 +34,7 @@ try:
     df127 = fetch("ods127", date_str)
     df152 = fetch("ods152", date_str)
     df166 = fetch("ods166", date_str)
-    df013 = fetch("ods013", date_str)  # <--- Fetch ods013
+    df013 = fetch("ods013", date_str)
 except Exception as e:
     st.error(f"Error fetching data: {e}")
     st.stop()
@@ -174,6 +178,7 @@ if all(c in df013.columns for c in ods013_colnames):
 
 else:
     st.warning("Some required data columns from ods013 are missing for the selected date, ATC plots not generated.")
+
 
 
 
