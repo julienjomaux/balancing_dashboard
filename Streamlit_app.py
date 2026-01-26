@@ -54,7 +54,7 @@ df134['datetime'] = pd.to_datetime(df134['datetime']); df134.sort_values('dateti
 df127['datetime'] = pd.to_datetime(df127['datetime']); df127.sort_values('datetime', inplace=True)
 df152['datetime'] = pd.to_datetime(df152['datetime']); df152.sort_values('datetime', inplace=True)
 df166['datetime'] = pd.to_datetime(df166['datetime']); df166.sort_values('datetime', inplace=True)
-
+st.write(df134)
 # --- PLOT 1: Imbalance price + alpha ---
 fig1, ax1 = plt.subplots(figsize=(12, 4))
 ax1.step(df134['datetime'], df134['imbalanceprice'], where='post', c='tab:blue', label='Imbalance Price', lw=2)
@@ -174,5 +174,6 @@ if all(c in df013.columns for c in ods013_colnames):
 
 else:
     st.warning("Some required data columns from ods013 are missing for the selected date, ATC plots not generated.")
+
 
 
